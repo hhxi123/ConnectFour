@@ -15,6 +15,8 @@ class Piece:
 class Board:
     def __init__(self, rows, columns):
         self.grid = [['O' for _ in range(columns)] for _ in range(rows)]
+        self.rows = rows
+        self.columns = columns
 
     def __repr__(self):
         grid_string = ""
@@ -50,12 +52,25 @@ class Board:
         l_diag_pieces = []
         l_diag_row = row - min(row, col)
         l_diag_col = col - min(row, col)
-        while l_diag_row < len(self.grid) and l_diag_col < len(self.grid[l_diag_row]):
+        while l_diag_row < self.rows and l_diag_col < self.columns:
             l_diag_pieces.append(self.grid[l_diag_row][l_diag_col])
             l_diag_row += 1
             l_diag_col += 1
         for i in range(len(l_diag_pieces) - 3):
             if l_diag_pieces[i:i+4] == winning_set:
+                return True
+
+        # Check right diagonal
+        r_diag_pieces = []
+        distance = min(self.rows-1 - row, self.columns-1 - col)
+        r_diag_row = row - distance
+        r_diag_col = col + distance
+        while r_diag_row < self.rows and r_diag_col >= 0:
+            r_diag_pieces.append(self.grid[r_diag_row][r_diag_col])
+            r_diag_row += 1
+            r_diag_col -= 1
+        for i in range(len(r_diag_pieces) - 3):
+            if r_diag_pieces[i:i+4] == winning_set:
                 return True
 
         return False
@@ -90,6 +105,5 @@ board.place_piece(yellow_piece, 6)
 board.place_piece(red_piece, 4)
 board.place_piece(red_piece, 5)
 board.place_piece(red_piece, 6)
-board.place_piece(red_piece, 7)
 print(board)
-print(board.check_win('R', 5, 0))
+print(board.check_win('R', 0, 6))
