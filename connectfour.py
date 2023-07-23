@@ -6,10 +6,7 @@ class Piece:
             self.color = 'Y'
 
     def show_icon(self):
-        if self.color == 'R':
-            return "Red"
-        elif self.color == 'Y':
-            return "Yellow"
+        return self.color
 
 
 class Board:
@@ -43,7 +40,7 @@ class Board:
                 return True
 
         # Check vertical
-        col_pieces = [i[col] for i in self.grid]
+        col_pieces = [i[col-1] for i in self.grid]
         for i in range(len(col_pieces) - 3):
             if col_pieces[i:i+4] == winning_set:
                 return True
@@ -51,7 +48,7 @@ class Board:
         # Check left diagonal
         l_diag_pieces = []
         l_diag_row = row - min(row, col)
-        l_diag_col = col - min(row, col)
+        l_diag_col = col - min(row, col) - 1
         while l_diag_row < self.rows and l_diag_col < self.columns:
             l_diag_pieces.append(self.grid[l_diag_row][l_diag_col])
             l_diag_row += 1
@@ -62,9 +59,9 @@ class Board:
 
         # Check right diagonal
         r_diag_pieces = []
-        distance = min(self.rows-1 - row, self.columns-1 - col)
+        distance = min(row, self.columns - col)
         r_diag_row = row - distance
-        r_diag_col = col + distance
+        r_diag_col = col + distance - 1
         while r_diag_row < self.rows and r_diag_col >= 0:
             r_diag_pieces.append(self.grid[r_diag_row][r_diag_col])
             r_diag_row += 1
@@ -79,8 +76,8 @@ class Board:
 class Game:
     def __init__(self):
         self.board = Board(6, 7)
-        self.turn = 'R'
         self.game_over = False
+        self.winner = ""
 
     def display(self):
         print(self.board)
@@ -89,21 +86,23 @@ class Game:
         piece = Piece(color)
         column = int(input(f"{color} turn\nColumn to place (1-7): "))
         row = self.board.place_piece(piece, column)
-        if self.board.check_win(color, row, column):
+        if self.board.check_win(piece.show_icon(), row, column):
             self.game_over = True
+            self.winner = color
 
 
-board = Board(6, 7)
-red_piece = Piece("Red")
-yellow_piece = Piece("Yellow")
-board.place_piece(yellow_piece, 4)
-board.place_piece(yellow_piece, 4)
-board.place_piece(yellow_piece, 4)
-board.place_piece(yellow_piece, 5)
-board.place_piece(yellow_piece, 5)
-board.place_piece(yellow_piece, 6)
-board.place_piece(red_piece, 4)
-board.place_piece(red_piece, 5)
-board.place_piece(red_piece, 6)
-print(board)
-print(board.check_win('R', 0, 6))
+def play():
+    game = Game()
+    is_red_turn = True
+    while not game.game_over:
+        game.display()
+        if is_red_turn:
+            game.take_turn("Red")
+        else:
+            game.take_turn("Yellow")
+        is_red_turn = not is_red_turn
+    game.display()
+    print(f"{game.winner} is the winner!")
+
+
+play()
