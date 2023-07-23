@@ -1,30 +1,32 @@
 class Piece:
     def __init__(self, color):
         if color == "Red":
-            self.color = 'R'
+            self.color = "\033[91m{}\033[00m".format("R")
         elif color == "Yellow":
-            self.color = 'Y'
+            self.color = "\033[93m{}\033[00m".format("Y")
 
-    def show_icon(self):
+    def icon(self):
         return self.color
 
 
 class Board:
     def __init__(self, rows, columns):
-        self.grid = [['O' for _ in range(columns)] for _ in range(rows)]
+        self.grid = [["O" for _ in range(columns)] for _ in range(rows)]
         self.rows = rows
         self.columns = columns
 
     def __repr__(self):
         grid_string = ""
         for row in self.grid:
-            grid_string += str(row) + "\n"
+            for space in row:
+                grid_string += " " + space + " "
+            grid_string += "\n"
         return grid_string
 
     def place_piece(self, piece, col):
         row = 5
         while row > 0:
-            if self.grid[row][col-1] == 'O':
+            if self.grid[row][col-1] == "O":
                 self.grid[row][col-1] = piece.color
                 break
             row -= 1
@@ -86,7 +88,7 @@ class Game:
         piece = Piece(color)
         column = int(input(f"{color} turn\nColumn to place (1-7): "))
         row = self.board.place_piece(piece, column)
-        if self.board.check_win(piece.show_icon(), row, column):
+        if self.board.check_win(piece.icon(), row, column):
             self.game_over = True
             self.winner = color
 
